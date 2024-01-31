@@ -55,7 +55,7 @@ public class Model {
 	
 	private View view;         // Model must tell View when to update itself
 	
-	private int cokeLeft, pepsiLeft, quartersLeft, dimesLeft, nickelsLeft;
+	private int cokeLeft, pepsiLeft, quartersLeft, dimesLeft, nickelsLeft, quartersChange, dimesChange,nickelsChange;
 	private final int cokePrice, pepsiPrice;
 	private double deposited;
 	private String message;
@@ -79,6 +79,9 @@ public class Model {
 		pepsiPrice = scanner.nextInt();
 		System.out.print("  Enter coke  cost in cents(95): ");
 		cokePrice = scanner.nextInt();
+		quartersChange = 0;
+		dimesChange=0;
+		nickelsChange = 0;
 		deposited = 0.25 * quartersLeft + 0.1 * dimesLeft + 0.05 * nickelsLeft;
 	}
 
@@ -86,20 +89,26 @@ public class Model {
 	public void buy(String product) {
 		switch (product.toLowerCase()) {
 			case "coke" -> {
-				if (deposited*100>cokePrice) {
+				if (cokeLeft<1) {
+					message = "Out of Coke";
+				}
+				else if (!canMakeChange((int)(deposited*100) - cokePrice)) message = "Cannot make correct change: ";
+				else if (deposited*100>cokePrice) {
+					cokeLeft--;
 					message = "Coke Bought: ";
 					buyHelper(cokePrice);
 				}
 				else message = "Deposit more money";
-				cokeLeft--;
 			}
 			case "pepsi" -> {
-				if (deposited*100>pepsiPrice) {
+				if (pepsiLeft<1) message = "Out of Pepsi";
+				else if (!canMakeChange((int)(deposited*100) - cokePrice)) message = "Cannot make correct change: ";
+				else if (deposited*100>pepsiPrice) {
+					pepsiLeft--;
 					message = "Pepsi Bought: ";
 					buyHelper(pepsiPrice);
 				}
 				else message = "Deposit more money";
-				pepsiLeft--;
 			}
 		}
 		view.update();
@@ -231,5 +240,31 @@ public class Model {
 		}
 		else message+="(no change)";
 		view.update();
+	}
+
+	private boolean canMakeChange(int amount) {
+		int originalAmount = amount;
+		int maxQChange = Math.min(quartersLeft, amount / 25);
+
+		for(quartersChange = maxQChange; quartersChange >= 0; --quartersChange) {
+			quartersLeft -= quartersChange;
+			amount -= 25 * quartersChange;
+			dimesChange = Math.min(dimesLeft, amount / 10);
+			dimesLeft -= dimesChange;
+			amount -= 10 * dimesChange;
+			nickelsChange = Math.min(nickelsLeft, amount / 5);
+			nickelsLeft -= nickelsChange;
+			amount -= 5 * nickelsChange;
+			if (amount == 0) {
+				return true;
+			}
+
+			quartersLeft += quartersChange;
+			dimesLeft += dimesChange;
+			nickelsLeft += nickelsChange;
+			amount = originalAmount;
+		}
+
+		return false;
 	}
 }
