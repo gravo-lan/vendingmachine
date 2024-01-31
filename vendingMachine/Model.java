@@ -92,7 +92,7 @@ public class Model {
 				if (cokeLeft<1) {
 					message = "Out of Coke";
 				}
-				else if (!canMakeChange((int)(deposited*100) - cokePrice)) message = "Cannot make correct change: ";
+				else if (canMakeChange((int) (deposited * 100) - cokePrice)) message = "Cannot make correct change: ";
 				else if (deposited*100>cokePrice) {
 					cokeLeft--;
 					message = "Coke Bought: ";
@@ -102,7 +102,7 @@ public class Model {
 			}
 			case "pepsi" -> {
 				if (pepsiLeft<1) message = "Out of Pepsi";
-				else if (!canMakeChange((int)(deposited*100) - cokePrice)) message = "Cannot make correct change: ";
+				else if (canMakeChange((int) (deposited * 100) - cokePrice)) message = "Cannot make correct change: ";
 				else if (deposited*100>pepsiPrice) {
 					pepsiLeft--;
 					message = "Pepsi Bought: ";
@@ -256,7 +256,7 @@ public class Model {
 			nickelsLeft -= nickelsChange;
 			amount -= 5 * nickelsChange;
 			if (amount == 0) {
-				return true;
+				return false;
 			}
 
 			quartersLeft += quartersChange;
@@ -265,6 +265,6 @@ public class Model {
 			amount = originalAmount;
 		}
 
-		return false;
+		return true;
 	}
 }
