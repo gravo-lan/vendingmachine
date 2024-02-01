@@ -55,7 +55,7 @@ public class Model {
 	
 	private View view;         // Model must tell View when to update itself
 	
-	private int cokeLeft, pepsiLeft, quartersLeft, dimesLeft, nickelsLeft, quartersChange, dimesChange,nickelsChange;
+	private int cokeLeft, pepsiLeft, quartersDeposited, dimesDeposited, nickelsDeposited, quartersChange, dimesChange, nickelsChange, quartersLeft, dimesLeft, nickelsLeft;
 	private final int cokePrice, pepsiPrice;
 	private double deposited;
 	private String message;
@@ -82,7 +82,7 @@ public class Model {
 		quartersChange = 0;
 		dimesChange=0;
 		nickelsChange = 0;
-		deposited = 0.25 * quartersLeft + 0.1 * dimesLeft + 0.05 * nickelsLeft;
+		deposited = 0.25 * quartersDeposited + 0.1 * dimesDeposited + 0.05 * nickelsDeposited;
 	}
 
 
@@ -126,9 +126,9 @@ public class Model {
 		return "Vending Machine State: \n" +
 			"  Coke     Left      = " + cokeLeft     + "\n" +
 			"  Pepsi    Left      = " + pepsiLeft    + "\n" +
-			"  Quarters Left      = " + quartersLeft + "\n" +
-			"  Dimes    Left      = " + dimesLeft    + "\n" +
-			"  Nickels  Left      = " + nickelsLeft  + "\n";
+			"  Quarters Left      = " + quartersDeposited + "\n" +
+			"  Dimes    Left      = " + dimesDeposited + "\n" +
+			"  Nickels  Left      = " + nickelsDeposited + "\n";
 		//Display any other instance variables that you declare too
 	}
 
@@ -150,31 +150,31 @@ public class Model {
 
 	public void cancel() {
 		message="Cancelled: ";
-		if (nickelsLeft>0&&dimesLeft>0&&quartersLeft>0) message+="returning =";
-		if (quartersLeft>0) {
-			if (quartersLeft == 1) message += "  1 quarter";
-			else message += "  " + quartersLeft + " quarters";
+		if (nickelsDeposited >0&& dimesDeposited >0&& quartersDeposited >0) message+="returning =";
+		if (quartersDeposited >0) {
+			if (quartersDeposited == 1) message += "  1 quarter";
+			else message += "  " + quartersDeposited + " quarters";
 		}
-		if (dimesLeft>0) {
-			if(dimesLeft == 1) message+= "  1 dime";
-			else message += "  " + dimesLeft + " dimes";
+		if (dimesDeposited >0) {
+			if(dimesDeposited == 1) message+= "  1 dime";
+			else message += "  " + dimesDeposited + " dimes";
 		}
-		if (nickelsLeft>0) {
-			if (nickelsLeft == 1) message+= "  1 nickel";
-			else message += "  " + nickelsLeft + " nickels";
+		if (nickelsDeposited >0) {
+			if (nickelsDeposited == 1) message+= "  1 nickel";
+			else message += "  " + nickelsDeposited + " nickels";
 		}
-		quartersLeft=0;
-		dimesLeft=0;
-		nickelsLeft=0;
+		quartersDeposited =0;
+		dimesDeposited =0;
+		nickelsDeposited =0;
 		deposited=0;
 		view.update();
 	}
 
 	public void deposit(int amount) {
 		switch (amount) {
-			case 5 -> nickelsLeft++;
-			case 10 -> dimesLeft++;
-			case 25 -> quartersLeft++;
+			case 5 -> nickelsDeposited++;
+			case 10 -> dimesDeposited++;
+			case 25 -> quartersDeposited++;
 		}
 		deposited+= (double) amount /100;
 		message = amount + " cents deposited";
@@ -197,17 +197,20 @@ public class Model {
 		int i = price;
 		cokeLeft--;
 		deposited-= (double) price /100;
-		while (i>25&&quartersLeft>0) {
+		while (i>25&& quartersDeposited >0) {
 			i-=25;
-			quartersLeft--;
+			quartersDeposited--;
+			quartersLeft++;
 		}
-		while (i>10&&dimesLeft>0) {
+		while (i>10&& dimesDeposited >0) {
 			i-=10;
-			dimesLeft--;
+			dimesDeposited--;
+			dimesLeft++;
 		}
-		while (i>5&&nickelsLeft>0) {
+		while (i>5&& nickelsDeposited >0) {
 			i-=5;
-			nickelsLeft--;
+			nickelsDeposited--;
+			nickelsLeft++;
 		}
 		if (deposited>0) {
 			message+="change =";
@@ -255,10 +258,7 @@ public class Model {
 			nickelsChange = Math.min(nickelsLeft, amount / 5);
 			nickelsLeft -= nickelsChange;
 			amount -= 5 * nickelsChange;
-			if (amount == 0) {
-				return false;
-			}
-
+			if (amount == 0) return false;
 			quartersLeft += quartersChange;
 			dimesLeft += dimesChange;
 			nickelsLeft += nickelsChange;
